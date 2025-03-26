@@ -82,8 +82,6 @@ const Solution = ({ problemid }) => {
 
   return (
     <form onSubmit={handleSubmission} className="text-gray-700 p-4 max-w-2xl mx-auto">
-      <h2 className="text-2xl font-bold mb-4">Submit Your Solution</h2>
-
       <div className="mb-4">
         <label className="block mb-2 font-medium">Select Language</label>
         <DropdownMenu>

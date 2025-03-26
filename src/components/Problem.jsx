@@ -1,5 +1,6 @@
 import React from "react";
 import { useParams, useSearchParams } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { data } from "@/data/data";
 import { problems } from "@/data/problems";
 import Solution from "@/components/Solution";
@@ -21,9 +22,12 @@ const Problem = () => {
 
     return (
         <div>
-            <div className="text-center text-2xl font-semibold bg-gray-800 text-white p-4">
-                {title}
+            
+            <div className="flex justify-between items-center text-2xl font-semibold bg-gray-800 text-white p-4">
+                <span>{title}</span>
+                <Link to="/" className="text-sm text-gray-300">(Homepage)</Link>
             </div>
+
             <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg">
                 <Navbar activeTab={activeTab} setSearchParams={setSearchParams} problemid={problemid} />
                 
