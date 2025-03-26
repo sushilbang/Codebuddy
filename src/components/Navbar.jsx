@@ -1,12 +1,19 @@
-// components/Navbar.jsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
-const Navbar = ({ activeTab, setActiveTab }) => {
+const Navbar = ({ activeTab, setSearchParams, problemid }) => {
+  const navigate = useNavigate();
+  
   const tabs = [
     { id: "problem", label: "Problem" },
     { id: "solution", label: "Solution Submission" },
     { id: "analysis", label: "Analysis" }
   ];
+
+  const handleTabClick = (tab) => {
+    setSearchParams({ tab }); // Updates URL without reloading the page
+    navigate(`/problems/${problemid}?tab=${tab}`);
+  };
 
   return (
     <div className="flex justify-around bg-gray-100 p-3 rounded-t-lg shadow-md">
@@ -18,7 +25,7 @@ const Navbar = ({ activeTab, setActiveTab }) => {
               ? "bg-blue-600 text-white" 
               : "bg-gray-200 text-gray-800 hover:bg-gray-300"
           }`}
-          onClick={() => setActiveTab(tab.id)}
+          onClick={() => handleTabClick(tab.id)}
         >
           {tab.label}
         </button>

@@ -1,4 +1,3 @@
-// components/Solution.jsx
 import React, { useState } from "react";
 import {
   DropdownMenu,
@@ -23,55 +22,42 @@ const Solution = ({ problemid }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
 
-  const handleSubmission = async (event) => {
-    event.preventDefault();
-    
-    if (!selectedLanguage) {
-      setError("Please select a programming language.");
-      return;
-    }
+  const handleSubmission = async (e) => {
+      e.preventDefault();
+      setIsSubmitting(true);
+      setError(null);
+      setSubmissionResult(null);
 
-    if (solution.trim() === "" && !selectedFile) {
-      setError("Please enter a solution or upload a file.");
-      return;
-    }
+      const formData = new FormData();
+      formData.append("problemId", problemid);
+      formData.append("languageId", selectedLanguage?.id);
 
-    setError(null);
-    setIsSubmitting(true);
-
-    const formData = new FormData();
-    formData.append("problemId", problemid);
-    formData.append("languageId", selectedLanguage.id);
-    
-    if (selectedFile) {
-      formData.append("codeFile", selectedFile);
-    } else {
-      formData.append("code", solution);
-    }
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
-        method: "POST",
-        body: formData,
-      });
-      
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`Submission failed: ${errorText || response.statusText}`);
+      if (selectedFile) {
+          formData.append("codeFile", selectedFile);
+      } else {
+          formData.append("code", solution);
       }
-      
-      const data = await response.json();
-      setSubmissionResult(data);
-      
-      setSolution("");
-      setSelectedFile(null);
-      setSelectedLanguage(null);
-    } catch (error) {
-      console.error("Submission error:", error);
-      setError(error.message || "An unexpected error occurred during submission.");
-    } finally {
-      setIsSubmitting(false);
-    }
+
+      try {
+          const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
+              method: "POST",
+              body: formData,
+          });
+
+          if (!response.ok) {
+              const errorText = await response.text();
+              throw new Error(`Submission failed: ${errorText || response.statusText}`);
+          }
+
+          const data = await response.json();
+          setSubmissionResult(data);
+
+      } catch (error) {
+          console.error("Submission error:", error);
+          setError(error.message || "An unexpected error occurred during submission.");
+      } finally {
+          setIsSubmitting(false);
+      }
   };
 
   const handleFileChange = (event) => {
@@ -81,7 +67,10 @@ const Solution = ({ problemid }) => {
   };
 
   return (
-    <div className="text-gray-700 p-4 max-w-2xl mx-auto">
+    <form 
+      onSubmit={(e) => handleSubmission(e)} 
+      className="text-gray-700 p-4 max-w-2xl mx-auto"
+    >
       <h2 className="text-2xl font-bold mb-4">Submit Your Solution</h2>
 
       <div className="mb-4">
@@ -146,7 +135,7 @@ const Solution = ({ problemid }) => {
       )}
 
       <button
-        onClick={handleSubmission}
+        type="submit"
         disabled={isSubmitting}
         className={`w-full py-3 rounded-md text-white font-bold ${
           isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
@@ -184,7 +173,7 @@ const Solution = ({ problemid }) => {
           ))}
         </div>
       )}
-    </div>
+    </form>
   );
 };
 

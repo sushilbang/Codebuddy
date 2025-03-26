@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app, resources={
     r"/api/*": {
         "origins": [
-            "http://localhost:3000",  # Next.js default
-            "http://localhost:5173",  # Vite default
+            "http://localhost:3000",
+            "http://localhost:5173",
             "http://127.0.0.1:3000",
             "http://127.0.0.1:5173"
         ],
@@ -87,18 +87,12 @@ def submit_code(source_code, input_data, language_id):
     headers = {"Content-Type": "application/json"}
     data = {
         "source_code": source_code,
-        "language_id": int(language_id),  # Convert to int to avoid issues
-        "stdin": input_data,
-        "wait": True  # Wait for execution to complete
+        "language_id": int(language_id),
+        "stdin": input_data
     }
 
     try:
-        response = requests.post(
-            f"{JUDGE0_URL}/submissions",
-            json=data,
-            headers=headers,
-            timeout=30  # Increased timeout for long-running submissions
-        )
+        response = requests.post(f"{JUDGE0_URL}/submissions", json=data, headers=headers, timeout=5)
         response.raise_for_status()
         return response.json().get("token")
     except Exception as e:
@@ -108,29 +102,37 @@ def submit_code(source_code, input_data, language_id):
 def get_submission_result(token):
     """Retrieve submission result from Judge0 API."""
     try:
-        response = requests.get(
-            f"{JUDGE0_URL}/submissions/{token}",
-            params={"base64_encoded": "false"},
-            timeout=30
-        )
-        response.raise_for_status()
-        result = response.json()
+        max_retries = 15
+        wait_time = 2
 
-        status_id = result.get("status", {}).get("id")
+        for _ in range(max_retries):
+            response = requests.get(f"{JUDGE0_URL}/submissions/{token}", 
+                                    params={"base64_encoded": "false"}, 
+                                    timeout=10)
+            response.raise_for_status()
+            result = response.json()
 
-        if status_id in [6, 7]:  # Compilation or Runtime Error
-            return {
-                "status": "Error",
-                "output": result.get("compile_output", "") or result.get("stderr", ""),
-                "passed": False
-            }
+            status_id = result.get("status", {}).get("id")
 
-        if status_id == 3:  # Accepted
-            return {
-                "status": "Success",
-                "output": result.get("stdout", "").strip() if result.get("stdout") else "",
-                "passed": False  # Will be set during comparison
-            }
+            if status_id in [1, 2]:  # In Queue or Processing
+                time.sleep(wait_time)
+                continue
+
+            if status_id in [6, 7]:  # Compilation or Runtime Error
+                return {
+                    "status": "Error",
+                    "output": result.get("compile_output", "") or result.get("stderr", ""),
+                    "passed": False
+                }
+
+            if status_id == 3:  # Accepted
+                return {
+                    "status": "Success",
+                    "output": result.get("stdout", "").strip() if result.get("stdout") else "",
+                    "passed": False
+                }
+
+            return {"status": "Error", "passed": False}
 
         return {"status": "Error", "passed": False}
 
@@ -155,9 +157,7 @@ def process_test_case(testcase, source_code, language_id):
             'expected_output': testcase['expected_output'],
             'actual_output': result.get('output', ''),
             'status': result['status'],
-            'passed': result.get('passed', False),
-            'stdout': result.get('output', ''),
-            'stderr': result.get('output', '') if result['status'] == 'Error' else ''
+            'passed': result.get('passed', False)
         }
     else:
         return {
@@ -165,9 +165,7 @@ def process_test_case(testcase, source_code, language_id):
             'expected_output': testcase['expected_output'],
             'actual_output': '',
             'status': 'Submission Failed',
-            'passed': False,
-            'stdout': '',
-            'stderr': 'Failed to submit code'
+            'passed': False
         }
 
 @app.errorhandler(Exception)
@@ -184,16 +182,15 @@ def submit_code_api():
     """API to handle code submissions."""
     try:
         # Debugging: print all form data
-        print("Received form data:", request.form)
-        print("Received files:", request.files)
+        print("Received form data:", dict(request.form))
+        print("Received files:", list(request.files.keys()))
 
         problem_id = request.form.get("problemId")
         language_id = request.form.get("languageId")
         
         # Check if code is from file or text input
         if 'codeFile' in request.files:
-            file = request.files['codeFile']
-            source_code = file.read().decode('utf-8')
+            source_code = request.files['codeFile'].read().decode('utf-8')
         else:
             source_code = request.form.get("code", "")
 
@@ -225,26 +222,19 @@ def submit_code_api():
         # Prepare response
         passed_count = sum(1 for r in results if r['passed'])
         total_tests = len(results)
-        stdout = results[0]['stdout'] if results else ""
-        stderr = results[0]['stderr'] if results and not results[0]['passed'] else ""
 
         response = {
             "summary": f"{passed_count}/{total_tests} test cases passed",
-            "details": results,
-            "stdout": stdout,
-            "stderr": stderr,
-            "status": "Success" if passed_count == total_tests else "Error"
+            "details": results
         }
-        
-        print(f"Response data: {response}")
+        print(f"reponse: {response['summary']}")
         return jsonify(response)
 
     except Exception as e:
         print(f"Submission API error: {e}")
         return jsonify({
             "error": "Submission processing failed",
-            "details": str(e),
-            "status": "Error"
+            "details": str(e)
         }), 500
 
 def get_file_extension(language_id):
