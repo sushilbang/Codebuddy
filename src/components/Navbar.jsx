@@ -12,7 +12,7 @@ const Navbar = ({ activeTab, setSearchParams, problemid }) => {
 
   const handleTabClick = (tab) => {
     setSearchParams({ tab }); // Updates URL without reloading the page
-    navigate(`/problems/${problemid}?tab=${tab}`);
+    navigate(`/problem/${problemid}?tab=${tab}`);
   };
 
   return (

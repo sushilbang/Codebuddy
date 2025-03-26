@@ -6,7 +6,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<ProblemList />} />
-        <Route path="/problems/:problemid" element={<Problem />} />
+        <Route path="/problem/:problemid" element={<Problem />} />
       </Routes>
     </Router>
   );

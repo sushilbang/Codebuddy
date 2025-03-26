@@ -42,11 +42,11 @@ def extract_testcases(problem_id):
     zip_path = os.path.join(TESTCASE_FOLDER, f"problem_{problem_id}.zip")
 
     # Debugging print statements
-    print(f"Searching for test case file: {zip_path}")
-    print(f"Testcase folder contents: {os.listdir(TESTCASE_FOLDER)}")
+    # print(f"Searching for test case file: {zip_path}")
+    # print(f"Testcase folder contents: {os.listdir(TESTCASE_FOLDER)}")
 
     if not os.path.exists(zip_path):
-        print(f"Test case file not found: {zip_path}")
+        # print(f"Test case file not found: {zip_path}")
         return []
 
     testcases = []
@@ -59,8 +59,8 @@ def extract_testcases(problem_id):
             in_files = sorted([f for f in zip_ref.namelist() if f.endswith('.in')])
             out_files = sorted([f for f in zip_ref.namelist() if f.endswith('.out')])
 
-            print(f"Input files: {in_files}")
-            print(f"Output files: {out_files}")
+            # print(f"Input files: {in_files}")
+            # print(f"Output files: {out_files}")
 
             # Ensure matching input and output files
             if len(in_files) != len(out_files):
@@ -182,8 +182,8 @@ def submit_code_api():
     """API to handle code submissions."""
     try:
         # Debugging: print all form data
-        print("Received form data:", dict(request.form))
-        print("Received files:", list(request.files.keys()))
+        # print("Received form data:", dict(request.form))
+        # print("Received files:", list(request.files.keys()))
 
         problem_id = request.form.get("problemId")
         language_id = request.form.get("languageId")

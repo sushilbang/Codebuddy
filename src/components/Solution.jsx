@@ -18,46 +18,60 @@ const Solution = ({ problemid }) => {
   const [solution, setSolution] = useState("");
   const [selectedFile, setSelectedFile] = useState(null);
   const [selectedLanguage, setSelectedLanguage] = useState(null);
-  const [submissionResult, setSubmissionResult] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submissionResult, setSubmissionResult] = useState(null);
   const [error, setError] = useState(null);
 
   const handleSubmission = async (e) => {
-      e.preventDefault();
-      setIsSubmitting(true);
-      setError(null);
-      setSubmissionResult(null);
+    e.preventDefault();
+    
+    if (!selectedLanguage) {
+      setError("Please select a programming language.");
+      return;
+    }
 
-      const formData = new FormData();
-      formData.append("problemId", problemid);
-      formData.append("languageId", selectedLanguage?.id);
+    if (!solution && !selectedFile) {
+      setError("Please enter a solution or upload a code file.");
+      return;
+    }
 
-      if (selectedFile) {
-          formData.append("codeFile", selectedFile);
-      } else {
-          formData.append("code", solution);
+    setIsSubmitting(true);
+    setError(null);
+    setSubmissionResult(null);
+
+    const formData = new FormData();
+    formData.append("problemId", problemid);
+    formData.append("languageId", selectedLanguage.id);
+
+    if (selectedFile) {
+      formData.append("codeFile", selectedFile);
+    } else {
+      formData.append("code", solution);
+    }
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
+        method: "POST",
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorText = await response.text();
+        throw new Error(`Submission failed: ${errorText || response.statusText}`);
       }
 
-      try {
-          const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
-              method: "POST",
-              body: formData,
-          });
-
-          if (!response.ok) {
-              const errorText = await response.text();
-              throw new Error(`Submission failed: ${errorText || response.statusText}`);
-          }
-
-          const data = await response.json();
-          setSubmissionResult(data);
-
-      } catch (error) {
-          console.error("Submission error:", error);
-          setError(error.message || "An unexpected error occurred during submission.");
-      } finally {
-          setIsSubmitting(false);
-      }
+      const data = await response.json();
+      localStorage.setItem(`submission_${problemid}`, JSON.stringify(data));
+      setSubmissionResult(data);
+      const tab = "analysis";
+      window.location.href = `http://localhost:5173/problem/${problemid}?tab=${tab}`;
+      
+    } catch (error) {
+      console.error("Submission error:", error);
+      setError(error.message || "An unexpected error occurred during submission.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleFileChange = (event) => {
@@ -67,10 +81,7 @@ const Solution = ({ problemid }) => {
   };
 
   return (
-    <form 
-      onSubmit={(e) => handleSubmission(e)} 
-      className="text-gray-700 p-4 max-w-2xl mx-auto"
-    >
+    <form onSubmit={handleSubmission} className="text-gray-700 p-4 max-w-2xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Submit Your Solution</h2>
 
       <div className="mb-4">
@@ -83,10 +94,7 @@ const Solution = ({ problemid }) => {
           </DropdownMenuTrigger>
           <DropdownMenuContent>
             {languageOptions.map((lang) => (
-              <DropdownMenuItem
-                key={lang.id}
-                onSelect={() => setSelectedLanguage(lang)}
-              >
+              <DropdownMenuItem key={lang.id} onSelect={() => setSelectedLanguage(lang)}>
                 {lang.name}
               </DropdownMenuItem>
             ))}
@@ -110,69 +118,33 @@ const Solution = ({ problemid }) => {
       </div>
 
       <div className="mb-4 flex items-center space-x-4">
-        <input
-          type="file"
-          id="codeFileUpload"
-          className="hidden"
-          onChange={handleFileChange}
-          accept=".cpp,.py"
-        />
-        <label 
-          htmlFor="codeFileUpload" 
-          className="cursor-pointer bg-blue-50 text-blue-700 px-4 py-2 rounded-md border border-blue-300 hover:bg-blue-100"
-        >
+        <input type="file" id="codeFileUpload" className="hidden" onChange={handleFileChange} accept=".cpp,.py" />
+        <label htmlFor="codeFileUpload" className="cursor-pointer bg-blue-50 text-blue-700 px-4 py-2 rounded-md border border-blue-300 hover:bg-blue-100">
           Upload Code File
         </label>
-        {selectedFile && (
-          <span className="text-sm text-gray-600">{selectedFile.name}</span>
-        )}
+        {selectedFile && <span className="text-sm text-gray-600">{selectedFile.name}</span>}
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-2 rounded-md mb-4">
-          {error}
-        </div>
-      )}
+      {error && <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-2 rounded-md mb-4">{error}</div>}
 
-      <button
-        type="submit"
-        disabled={isSubmitting}
-        className={`w-full py-3 rounded-md text-white font-bold ${
-          isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
-        }`}
-      >
-        {isSubmitting ? 'Submitting...' : 'Submit Solution'}
-      </button>
-
-      {submissionResult && (
-        <div className="mt-4 p-4 bg-green-50 border border-green-300 rounded-md">
-          <h3 className="font-bold text-green-800 mb-2">Submission Results</h3>
-          <div className="mb-2">
-            <span className="font-semibold">Summary:</span> {submissionResult.summary}
-          </div>
-          
-          {submissionResult.details?.map((testCase, index) => (
-            <div key={index} className="mb-3 p-2 bg-white rounded border">
-              <div className="font-medium">Test Case {index + 1}:</div>
-              <div className={`text-sm ${testCase.passed ? 'text-green-600' : 'text-red-600'}`}>
-                Status: {testCase.passed ? 'Passed' : 'Failed'}
-              </div>
-              {!testCase.passed && (
-                <>
-                  <div className="mt-1">
-                    <span className="font-medium">Expected:</span>
-                    <pre className="whitespace-pre-wrap">{testCase.expected_output}</pre>
-                  </div>
-                  <div className="mt-1">
-                    <span className="font-medium">Received:</span>
-                    <pre className="whitespace-pre-wrap">{testCase.actual_output}</pre>
-                  </div>
-                </>
-              )}
+      {/* {submissionResult && (
+        <div className="mb-4 p-4 border rounded-md bg-gray-100">
+          <h3 className="font-bold mb-2">Submission Result</h3>
+          {submissionResult.details.map((testCase, index) => (
+            <div key={index} className={`mb-2 p-2 rounded ${testCase.passed ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'}`}>
+              <p className="font-bold">Test Case {index + 1}: 
+                <span className={testCase.passed ? 'text-green-700' : 'text-red-700'}>
+                  {testCase.passed ? ' Passed' : ' Failed'}
+                </span>
+              </p>
             </div>
           ))}
         </div>
-      )}
+      )} */}
+
+      <button type="submit" disabled={isSubmitting} className={`w-full py-3 rounded-md text-white font-bold ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
+        {isSubmitting ? 'Submitting...' : 'Submit Solution'}
+      </button>
     </form>
   );
 };
