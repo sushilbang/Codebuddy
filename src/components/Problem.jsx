@@ -1,9 +1,11 @@
+// pages/Problem.jsx
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { data } from "@/data/data";
 import { problems } from "@/data/problems";
 import Solution from "@/components/Solution";
 import Analysis from "@/components/Analysis";
+import Navbar from "@/components/Navbar";
 import "@/styles/styles.css";
 
 const Problem = () => {
@@ -22,28 +24,15 @@ const Problem = () => {
                 {title}
             </div>
             <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg">
-                {/* Navbar */}
-                <div className="flex justify-around bg-gray-100 p-3 rounded-t-lg shadow-md">
-                    {["problem", "solution", "analysis"].map((tab) => (
-                        <button 
-                            key={tab}
-                            className={`w-1/3 text-center py-2 font-medium transition duration-200 ${
-                                activeTab === tab ? "bg-blue-600 text-white" : "bg-gray-200 text-gray-800 hover:bg-gray-300"
-                            }`}
-                            onClick={() => setActiveTab(tab)}
-                        >
-                            {tab === "problem" ? "Problem" : tab === "solution" ? "Solution Submission" : "Analysis"}
-                        </button>
-                    ))}
-                </div>
-
+                <Navbar activeTab={activeTab} setActiveTab={setActiveTab} />
+                
                 {/* Content Sections */}
                 <div className="p-4">
                     {activeTab === "problem" && (
                         <div dangerouslySetInnerHTML={{ __html: problem.content }} />
                     )}
                     {activeTab === "solution" && (
-                        <Solution problemid={problemid} activeTab={activeTab} />
+                        <Solution problemid={problemid} />
                     )}
                     {activeTab === "analysis" && (
                         <Analysis problemid={problemid} />
