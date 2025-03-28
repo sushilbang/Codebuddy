@@ -5,6 +5,11 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const AdmZip = require("adm-zip");
+const dotenv = require("dotenv");
+const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth");
+
+dotenv.config();
 
 const app = express();
 const PORT = 5000;
@@ -18,6 +23,17 @@ fs.mkdirSync(TESTCASE_FOLDER, { recursive: true });
 app.use(cors());
 app.use(express.json());
 const upload = multer({ dest: UPLOAD_FOLDER });
+
+// Database connection
+mongoose
+  .connect(process.env.MONGO_URI, { useNewUrlParser: true, useUnifiedTopology: true })
+  .then(() => {
+    console.log("✅ MongoDB Connected Successfully");
+  })
+  .catch((err) => {
+    console.error("❌ MongoDB Connection Error:", err.message);
+    process.exit(1);  // Stop the server if DB connection fails
+  });
 
 const extractTestcases = (problemId) => {
     const zipPath = path.join(TESTCASE_FOLDER, `problem_${problemId}.zip`);
@@ -91,5 +107,8 @@ app.post("/api/submissions/submit", upload.single("codeFile"), async (req, res) 
         res.status(500).json({ error: "Submission processing failed" });
     }
 });
+
+// Routes
+app.use('/api/auth', authRoutes);
 
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
