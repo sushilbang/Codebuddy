@@ -8,10 +8,10 @@ const LandingPage = () => {
       <section className="h-screen flex items-center justify-center bg-gradient-to-b from-gray-200 to-gray-100 hero-section">
         <div className="max-w-4xl mx-auto text-center px-6">
           <h1 className="text-5xl md:text-6xl font-bold mb-6">
-            <span className="text-blue-600">Revolutionary</span> Platform for Your Needs
+            Welcome to <span className="text-blue-600">CodeBuddy</span>
           </h1>
           <p className="text-xl text-gray-600 mb-8">
-            Transform the way you work with our cutting-edge solutions designed for the modern world.
+            A powerful platform to enhance your coding skills with real-time execution, problem-solving, and efficiency analysis.
           </p>
           <div className="flex flex-col sm:flex-row justify-center gap-4">
             <Link
@@ -34,25 +34,25 @@ const LandingPage = () => {
       <section className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <h2 className="text-4xl font-bold text-center mb-16">
-            Our <span className="text-blue-600">Features</span>
+            Why Choose <span className="text-blue-600">CodeBuddy</span>?
           </h2>
 
           <div className="grid md:grid-cols-3 gap-10">
             {[
               {
-                title: "Powerful Analytics",
-                description: "Gain valuable insights with our advanced analytics tools.",
+                title: "Real-Time Code Execution",
+                description: "Run your code instantly with our integrated Judge0 execution engine.",
+                icon: "⚡",
+              },
+              {
+                title: "Comprehensive Problem Set",
+                description: "Access a wide variety of coding challenges and improve your problem-solving skills.",
+                icon: "📚",
+              },
+              {
+                title: "Performance Analysis",
+                description: "Analyze your code’s efficiency and optimize it for better performance.",
                 icon: "📊",
-              },
-              {
-                title: "Secure Platform",
-                description: "Your data is safe with our enterprise-grade security measures.",
-                icon: "🔒",
-              },
-              {
-                title: "Easy Integration",
-                description: "Seamlessly connect with your existing workflow and tools.",
-                icon: "🔄",
               },
             ].map((feature, index) => (
               <div
@@ -72,10 +72,10 @@ const LandingPage = () => {
       <section className="py-20 px-6 bg-gradient-to-t from-gray-200 to-gray-100">
         <div className="max-w-4xl mx-auto text-center">
           <h2 className="text-4xl font-bold mb-6">
-            Ready to <span className="text-blue-600">Get Started</span>?
+            Ready to <span className="text-blue-600">Start Coding</span>?
           </h2>
           <p className="text-xl text-gray-600 mb-8">
-            Join thousands of satisfied users and take your experience to the next level.
+            Join CodeBuddy today and become a better programmer with hands-on coding experience.
           </p>
           <Link
             to="/register"
@@ -91,9 +91,9 @@ const LandingPage = () => {
         <div className="max-w-6xl mx-auto">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <div className="mb-6 md:mb-0">
-              <Link to="/" className="text-xl font-bold text-blue-600">Name</Link>
+              <Link to="/" className="text-xl font-bold text-blue-600">CodeBuddy</Link>
               <p className="text-gray-600 mt-2">
-                © {new Date().getFullYear()} Name. All rights reserved.
+                © {new Date().getFullYear()} CodeBuddy. All rights reserved.
               </p>
             </div>
 
