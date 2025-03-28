@@ -16,7 +16,7 @@ const ProfileMenu = () => {
         </Avatar>
       </DropdownMenuTrigger>
       
-      <DropdownMenuContent>
+      <DropdownMenuContent className="left-0 -translate-x-6 translate-y-2">
         <DropdownMenuLabel>{user?.name || "My Account"}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem as="a" href="/profile">Profile</DropdownMenuItem>

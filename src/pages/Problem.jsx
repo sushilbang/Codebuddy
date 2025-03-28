@@ -25,7 +25,7 @@ const Problem = () => {
     const title = problems.find(problem => problem.problemid.toString() === problemid)?.title;
 
     const [searchParams, setSearchParams] = useSearchParams();
-    const activeTab = searchParams.get("tab") || "problem"; // Default to "problem"
+    const activeTab = searchParams.get("tab") || "problem";
 
     if (!problem) {
         return <p className="text-center text-red-500 font-semibold mt-4">Problem not found</p>;

@@ -1,13 +1,11 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import axios from "axios";
 import { toast } from "react-toastify";
-
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
-
   const login = async (email, password) => {
     try {
       const response = await axios.post("http://localhost:5000/api/auth/login", { email, password });
