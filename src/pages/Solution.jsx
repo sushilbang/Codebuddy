@@ -6,6 +6,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
+import LoadingSpinner from "@/components/LoadingSpinner";
 
 const API_BASE_URL = 'http://localhost:5000';
 
@@ -125,23 +126,14 @@ const Solution = ({ problemid }) => {
 
       {error && <div className="bg-red-50 border border-red-300 text-red-800 px-4 py-2 rounded-md mb-4">{error}</div>}
 
-      {/* {submissionResult && (
-        <div className="mb-4 p-4 border rounded-md bg-gray-100">
-          <h3 className="font-bold mb-2">Submission Result</h3>
-          {submissionResult.details.map((testCase, index) => (
-            <div key={index} className={`mb-2 p-2 rounded ${testCase.passed ? 'bg-green-100 border-green-300' : 'bg-red-100 border-red-300'}`}>
-              <p className="font-bold">Test Case {index + 1}: 
-                <span className={testCase.passed ? 'text-green-700' : 'text-red-700'}>
-                  {testCase.passed ? ' Passed' : ' Failed'}
-                </span>
-              </p>
-            </div>
-          ))}
-        </div>
-      )} */}
-
-      <button type="submit" disabled={isSubmitting} className={`w-full py-3 rounded-md text-white font-bold ${isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}>
-        {isSubmitting ? 'Submitting...' : 'Submit Solution'}
+      <button 
+        type="submit" 
+        disabled={isSubmitting} 
+        className={`w-full py-3 rounded-md text-white font-bold flex justify-center items-center ${
+          isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+        }`}
+      >
+        {isSubmitting ? <LoadingSpinner size="small" color="white" /> : 'Submit Solution'}
       </button>
     </form>
   );

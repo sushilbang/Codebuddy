@@ -36,6 +36,7 @@ const Problem = () => {
             
             <div className="flex justify-between items-center text-2xl font-semibold bg-gray-800 text-white p-4">
                 <span>{title}</span>
+                <Link to="/problem-list"><span className="text-xs">(homepage)</span></Link>
                 <ProfileMenu/>
             </div>
 

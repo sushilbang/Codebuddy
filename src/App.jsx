@@ -9,6 +9,7 @@ import Register from "@/pages/Register";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LandingNavbar from "@/components/LandingNavbar";
 import "@/styles/styles.css";
+import Profile from "./pages/Profile";
 
 function AppContent() {
   const { user } = useAuth();
@@ -21,6 +22,11 @@ function AppContent() {
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/profile" element={
+            <ProtectedRoute>
+              <Profile/>
+            </ProtectedRoute>
+          }/>
           <Route 
             path="/problem-list" 
             element={

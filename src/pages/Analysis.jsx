@@ -24,27 +24,11 @@ const Analysis = ({ problemid }) => {
             const totalTests = submissionData.details.length;
             const passedTests = submissionData.details.filter(test => test.passed).length;
             const passRate = (passedTests / totalTests) * 100;
+            const analysis = submissionData.analysis;
 
-            let performanceAnalysis = "";
-            if (passRate === 100) {
-                performanceAnalysis = "Excellent solution! You passed all test cases.";
-            } else if (passRate >= 75) {
-                performanceAnalysis = "Good solution. Most test cases passed.";
-            } else if (passRate >= 50) {
-                performanceAnalysis = "Partial solution. Needs improvement.";
-            } else {
-                performanceAnalysis = "Solution needs significant work.";
-            }
+            setAnalysisResult(`Performance: ${passRate},
 
-            // Hypothetical complexity estimation
-            const estimatedComplexity = 
-                passedTests > totalTests * 0.8 ? "O(n)" : 
-                passedTests > totalTests * 0.5 ? "O(n²)" : "O(2^n)";
-
-            setAnalysisResult(`
-                Performance: ${performanceAnalysis}
-                Test Case Coverage: ${passedTests}/${totalTests} (${passRate.toFixed(2)}%)
-                Estimated Time Complexity: ${estimatedComplexity}
+Analysis: ${analysis}    
             `);
         }
     }, [submissionData]);
