@@ -6,16 +6,28 @@ const authMiddleware = require("../middleware/authMiddleware.js");
 
 // Register
 router.post('/register', async (req, res) => {
-    const {email, password} = req.body;
-
-    if (!email || !password) {
+    const {username, email, password} = req.body;
+    
+    if (!username || !email || !password) {
         return res.status(400).json({ error: "Email and password are required" });
     }
+
+    const existingUsername = await User.findOne({ username });
+    if (existingUsername) {
+        return res.status(400).json({ error: "Username is already taken" });
+    }
+
+    const existingEmail = await User.findOne({ email });
+    if (existingEmail) {
+        return res.status(400).json({ error: "Email is already registered" });
+    }
+
     try {
-        const user = new User({ email, password });
+        const user = new User({ username, email, password });
         await user.save();
         res.status(201).json({ message: "User registered successfully" });
     } catch (error) {
+        console.log(error);
         res.status(400).json({message: error.message});
     }
 });

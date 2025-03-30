@@ -20,6 +20,7 @@ const Profile = () => {
         }
 
         const data = await response.json();
+        console.log(data);
         setUserData(data); // Store user data in state
       } catch (error) {
         console.error("Error fetching user:", error);
@@ -35,7 +36,7 @@ const Profile = () => {
         <h1 className="text-2xl font-bold text-gray-700 mb-4">Profile Page</h1>
         {userData ? (
           <div>
-            <p className="text-lg font-medium text-gray-600 text-left">Name: Username<span className="font-semibold">{userData.name}</span></p>
+            <p className="text-lg font-medium text-gray-600 text-left">Name: <span className="font-semibold">{userData.username}</span></p>
             <p className="text-lg font-medium text-gray-600 text-left">Email: <span className="font-semibold">{userData.email}</span></p>
           </div>
         ) : (
