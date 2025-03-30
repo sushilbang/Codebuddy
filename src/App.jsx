@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Problem from "@/pages/Problem";
 import ProblemList from "@/pages/ProblemList";
+import { ToastContainer } from "react-toastify";
 import ProtectedRoute from "./context/ProtectedRoute";
 import LandingPage from "@/pages/LandingPage";
 import Login from "@/pages/Login";
@@ -52,6 +53,7 @@ function AppContent() {
 function App() {
   return (
     <AuthProvider>
+      <ToastContainer position="top-right" autoClose={3000} />
       <Router>
         <AppContent />
       </Router>

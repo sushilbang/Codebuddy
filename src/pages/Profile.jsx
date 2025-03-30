@@ -30,16 +30,18 @@ const Profile = () => {
   }, [token]); // Runs when the token changes
 
   return (
-    <div>
-      <h1>Profile Page</h1>
-      {userData ? (
-        <div>
-          <p>Name: {userData.name}</p>
-          <p>Email: {userData.email}</p>
-        </div>
-      ) : (
-        <p>Loading user data...</p>
-      )}
+    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+      <div className="bg-white rounded-2xl p-6 w-96 text-center">
+        <h1 className="text-2xl font-bold text-gray-700 mb-4">Profile Page</h1>
+        {userData ? (
+          <div>
+            <p className="text-lg font-medium text-gray-600 text-left">Name: Username<span className="font-semibold">{userData.name}</span></p>
+            <p className="text-lg font-medium text-gray-600 text-left">Email: <span className="font-semibold">{userData.email}</span></p>
+          </div>
+        ) : (
+          <p className="text-gray-500">Loading user data...</p>
+        )}
+      </div>
     </div>
   );
 };
