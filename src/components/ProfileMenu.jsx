@@ -21,6 +21,7 @@ const ProfileMenu = () => {
       <DropdownMenuContent className="left-0 -translate-x-6 translate-y-2">
         <DropdownMenuLabel>{user?.name || "My Account"}</DropdownMenuLabel>
         <DropdownMenuSeparator />
+        <DropdownMenuItem onClick={() => navigate("/problem-list")}>Problem List</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />

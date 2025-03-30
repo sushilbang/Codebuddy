@@ -25,7 +25,7 @@ const Solution = ({ problemid }) => {
 
   const handleSubmission = async (e) => {
     e.preventDefault();
-    
+    const token = localStorage.getItem("token");
     if (!selectedLanguage) {
       setError("Please select a programming language.");
       return;
@@ -54,6 +54,9 @@ const Solution = ({ problemid }) => {
       const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
         method: "POST",
         body: formData,
+        headers: {
+          Authorization: `Bearer ${token}`,
+        }
       });
 
       if (!response.ok) {

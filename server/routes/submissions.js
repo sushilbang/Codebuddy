@@ -4,7 +4,8 @@ const fs = require("fs");
 const path = require("path");
 const axios = require("axios");
 const Groq = require("groq-sdk");
-
+const User = require("../models/User");
+const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 const JUDGE0_URL = "http://127.0.0.1:2358"; // Self-hosted Judge0
 
@@ -112,8 +113,9 @@ const analyzeCode = async (code, language, passedCount, totalCount) => {
 };
 
 // **Submission API with Code Analysis**
-router.post("/submit", upload.single("codeFile"), async (req, res) => {
+router.post("/submit",upload.single("codeFile"),  authMiddleware,async (req, res) => {
     try {
+        const userId = req.user.id;
         const { problemId, languageId, code } = req.body;
         if (!problemId || !languageId) return res.status(400).json({ error: "Missing required fields" });
 
@@ -126,7 +128,12 @@ router.post("/submit", upload.single("codeFile"), async (req, res) => {
         const totalCount = results.length;
         // Call Groq AI for code analysis
         const analysis = await analyzeCode(source_code, languageId, passedCount, totalCount);
-
+        if (passedCount === totalCount) {
+            const user = await User.findById(userId); // Fetch user from DB
+            if (user) {
+                await user.addSolvedProblem(problemId); // Add solved problem if all test cases passed
+            }
+        }
         res.json({
             summary: `${passedCount}/${results.length} test cases passed`,
             details: results,
@@ -138,5 +145,20 @@ router.post("/submit", upload.single("codeFile"), async (req, res) => {
         res.status(500).json({ error: "Submission processing failed" });
     }
 });
+
+// router.get("/getSubmissions", authMiddleware,async (req, res) => {
+//     try {
+//         const userId = req.user.id;
+//         const user = await User.findById(userId);
+//         if(!user) {
+//             return res.status(200).json("User not found");
+//         }
+//         const sub_count = user.submissions.length;
+//         return res.status(200).json({sub_count});
+//     } catch (error) {
+//         console.error("Submission API error:", error);
+//         res.status(500).json({ error: "Did not got submission" });
+//     }
+// })
 
 module.exports = router;
