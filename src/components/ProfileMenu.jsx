@@ -24,7 +24,6 @@ const ProfileMenu = () => {
         <DropdownMenuItem onClick={() => navigate("/problem-list")}>Problem List</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/submissions")}>Submissions</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
-        <DropdownMenuItem onClick={() => navigate("/settings")}>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={() => { logout(); navigate("/login"); }} 

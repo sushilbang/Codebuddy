@@ -45,18 +45,12 @@ const Profile = () => {
 
   return (
     <div className="relative min-h-screen bg-gray-100 flex items-center justify-center">
-      
-      {/* Profile Menu in the Top-Right Corner */}
       <div className="absolute top-4 right-8">
         <ProfileMenu />
       </div>
-
-      {/* Profile Card */}
-      <div className="bg-white rounded-2xl p-6 w-[600px] flex flex-col">
-        
-        {/* User Info (Top Left) */}
-        <div className="flex justify-between items-start">
-          <div className="text-left">
+      <div className="rounded-2xl p-6 flex flex-col absolute top-0 left-8">
+        <div className="flex flex-col justify-between items-start">
+          <div className="text-left bg-white rounded-md p-4">
             <h1 className="text-2xl font-bold text-gray-700 mb-2">Profile</h1>
             {userData && (
               <>
@@ -69,15 +63,13 @@ const Profile = () => {
               </>
             )}
           </div>
-
-          {/* Chart (Top Right) */}
-          <div className="w-40">
+        </div>
+          <div className="bg-white mt-5 rounded-md p-2 w-40 items-center">
             <Pie data={chartData} />
             <p className="mt-2 text-center font-semibold text-gray-700">
               Solved: {solvedProblems} / {TOTAL_PROBLEMS}
             </p>
           </div>
-        </div>
       </div>
     </div>
   );
