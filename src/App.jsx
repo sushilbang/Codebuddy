@@ -20,7 +20,7 @@ function AppContent() {
       {!user && <LandingNavbar />}
       <main className="flex-grow">
         <Routes>
-          <Route path="/" element={<LandingPage />} />
+          <Route path="/" element={user ? <ProblemList/> : <LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route path="/profile" element={
