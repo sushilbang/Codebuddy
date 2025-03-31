@@ -1,11 +1,11 @@
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuItem } from "@/components/ui/dropdown-menu";
 import { useAuth } from "@/context/AuthContext";
-import { useNavigate } from "react-router-dom";  // Import useNavigate
+import { useNavigate } from "react-router-dom";  
 
 const ProfileMenu = () => {
   const { user, logout } = useAuth();
-  const navigate = useNavigate();  // Initialize navigation
+  const navigate = useNavigate();
 
   return (
     <DropdownMenu>
@@ -22,6 +22,7 @@ const ProfileMenu = () => {
         <DropdownMenuLabel>{user?.name || "My Account"}</DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={() => navigate("/problem-list")}>Problem List</DropdownMenuItem>
+        <DropdownMenuItem onClick={() => navigate("/submissions")}>Submissions</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/profile")}>Profile</DropdownMenuItem>
         <DropdownMenuItem onClick={() => navigate("/settings")}>Settings</DropdownMenuItem>
         <DropdownMenuSeparator />

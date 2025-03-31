@@ -11,6 +11,7 @@ import { AuthProvider, useAuth } from "@/context/AuthContext";
 import LandingNavbar from "@/components/LandingNavbar";
 import "@/styles/styles.css";
 import Profile from "./pages/Profile";
+import Submissions from "./pages/Submissions";
 
 function AppContent() {
   const { user } = useAuth();
@@ -41,6 +42,14 @@ function AppContent() {
             element={
               <ProtectedRoute>
                 <Problem />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/submissions" 
+            element={
+              <ProtectedRoute>
+                <Submissions />
               </ProtectedRoute>
             } 
           />

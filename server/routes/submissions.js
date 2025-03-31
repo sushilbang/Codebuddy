@@ -186,6 +186,18 @@ router.get("/latest/:problemid", authMiddleware, async (req, res) => {
     }
 });
 
+router.get("/allSubmissions", authMiddleware, async(req, res) => {
+    try {
+        const userId = req.user.id;
+        const submissions = await Submission.find({userId});
+
+        res.status(200).json({submissions});
+    } catch (error) {
+        console.error("Error fetching all submission:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+});
+
   
 
 // router.get("/getSubmissions", authMiddleware,async (req, res) => {

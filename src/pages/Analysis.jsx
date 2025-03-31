@@ -35,7 +35,11 @@ const Analysis = ({ problemid }) => {
         );
       }
     } catch (err) {
-      setError(err.message || "An error occurred while fetching submission data.");
+      if(err.message) {
+        setError("No solutions submitted");
+      } else {
+        setError("An error occurred while fetching submission data.");
+      }
     } finally {
       setLoading(false);
     }
