@@ -9,6 +9,7 @@ const Submission = require("../models/Submissions");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 const JUDGE0_URL = "http://127.0.0.1:2358"; // Self-hosted Judge0
+const problems = require("../../src/data/problems");
 
 const UPLOAD_FOLDER = path.join(__dirname, "../uploads");
 const TESTCASE_FOLDER = path.join(__dirname, "../testcases");
@@ -81,7 +82,7 @@ const processTestCase = async (testcase, source_code, language_id) => {
 };
 
 // **AI Analysis Function**
-const analyzeCode = async (code, language, passedCount, totalCount) => {
+const analyzeCode = async (problem, code, language, passedCount, totalCount) => {
     try {
         const response = await groq.chat.completions.create({
             model: "llama-3.3-70b-versatile",
@@ -91,16 +92,10 @@ const analyzeCode = async (code, language, passedCount, totalCount) => {
                 1) Time complexity analysis  
                 2) Space complexity analysis  
 
-                Then, provide feedback in points.  
-
-                If all test cases have passed (${passedCount} === ${totalCount}), acknowledge that the solution works correctly but suggest possible optimizations in terms of time and space complexity. If the solution is already optimal, mention that explicitly.  
-
-                If some test cases have failed (${passedCount} < ${totalCount}), first indicate that the solution is incorrect. Analyze possible reasons for failure, such as edge cases, incorrect logic, or inefficiencies. Then, suggest improvements with a focus on optimizing time and space complexity.  
-
-                Give the response in plain text and only focus on performance improvements related to time and space complexity.
+                Then, provide feedback in points regarding whether the user is going in right redirection or not and how he can improve his code's time and space complexity. Give only plain text and small answer.
                 ` 
             },
-                { role: "user", content: `Analyze the following ${language} code:\n\n${code}` }
+                { role: "user", content: `This is the code that I wrote for the problem: ${problem} of CSES Problem Set. Analyze the following ${language} code:\n\n${code}` }
             ],
             temperature: 0.7,
             max_tokens: 1000
@@ -130,9 +125,12 @@ router.post("/submit", upload.single("codeFile"), authMiddleware, async (req, re
         // Count passed test cases
         const passedCount = results.filter(r => r.passed).length;
         const totalCount = results.length;
-
+        // get the problem
+        const problemList = problems.problems;
+        const problem = problemList.find((p) => Number(p.problemid) === Number(problemId));
+        const title = problem.title;
         // AI Analysis
-        const analysis = await analyzeCode(source_code, languageId, passedCount, totalCount);
+        const analysis = await analyzeCode(title, source_code, languageId, passedCount, totalCount);
         // Summary
         const summary = `Passed ${passedCount} out of ${totalCount} test cases.`;
         // **Save submission to database**
@@ -166,6 +164,21 @@ router.post("/submit", upload.single("codeFile"), authMiddleware, async (req, re
         res.status(500).json({ error: "Submission processing failed" });
     }
 });
+
+// router.post("/check", async (req, res) => {
+//     try {
+//         const problemId = 1;
+//         const problemList = problems.problems;
+//         console.log(problemList);
+//         const problem = problemList.find((p) => Number(p.problemid) === Number(problemId));
+//         // AI Analysis
+//         console.log(problem.title);
+//         // const analysis = await analyzeCode(problem, source_code, languageId, passedCount, totalCount);
+//     } catch (error) {
+//         console.error("Submission API error:", error);
+//         res.status(500).json({ error: "Kuch to error hua" });
+//     }
+// })
 
 router.get("/latest/:problemid", authMiddleware, async (req, res) => {
     try {
