@@ -18,11 +18,16 @@ const Register = () => {
     setError("");
     
     try {
-      const response = await axios.post("http://localhost:5000/api/auth/register", { username, email, password });
+      const response = await axios.post(
+        "http://localhost:5000/api/auth/register", 
+        { username, email, password },
+        { withCredentials: true } // Allow setting authentication cookie
+      );
+
       toast.success("Registered successfully! ✅");
       if (response.status === 201) navigate("/login");
     } catch (err) {
-      toast.error(err.response?.data?.error);
+      toast.error(err.response?.data?.error || "Registration failed");
       setError(err.response?.data?.error || "Registration failed");
     } finally {
       setIsLoading(false);
@@ -34,7 +39,7 @@ const Register = () => {
       <div className="bg-white p-8 rounded-lg border border-gray-200 shadow-lg w-full max-w-md">
         <h1 className="text-3xl font-bold mb-6 text-center text-blue-600">Register</h1>
         <form onSubmit={handleSubmit}>
-        <div className="mb-4">
+          <div className="mb-4">
             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
               Username
             </label>
