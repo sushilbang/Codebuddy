@@ -8,7 +8,7 @@ import {
 import { Button } from "@/components/ui/button";
 import LoadingSpinner from "@/components/LoadingSpinner";
 
-const API_BASE_URL = 'http://localhost:5000';
+const API_BASE_URL = "http://localhost:5000";
 
 const languageOptions = [
   { id: 54, name: "C++" },
@@ -25,7 +25,7 @@ const Solution = ({ problemid }) => {
 
   const handleSubmission = async (e) => {
     e.preventDefault();
-    const token = localStorage.getItem("token");
+
     if (!selectedLanguage) {
       setError("Please select a programming language.");
       return;
@@ -54,9 +54,7 @@ const Solution = ({ problemid }) => {
       const response = await fetch(`${API_BASE_URL}/api/submissions/submit`, {
         method: "POST",
         body: formData,
-        headers: {
-          Authorization: `Bearer ${token}`,
-        }
+        credentials: "include", // Send HTTP-only cookie for authentication
       });
 
       if (!response.ok) {
@@ -65,11 +63,10 @@ const Solution = ({ problemid }) => {
       }
 
       const data = await response.json();
-      localStorage.setItem(`submission_${problemid}`, JSON.stringify(data));
       setSubmissionResult(data);
+
       const tab = "analysis";
       window.location.href = `http://localhost:5173/problem/${problemid}?tab=${tab}`;
-      
     } catch (error) {
       console.error("Submission error:", error);
       setError(error.message || "An unexpected error occurred during submission.");
@@ -133,10 +130,10 @@ const Solution = ({ problemid }) => {
         type="submit" 
         disabled={isSubmitting} 
         className={`w-full py-3 rounded-md text-white font-bold flex justify-center items-center ${
-          isSubmitting ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'
+          isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-blue-600 hover:bg-blue-700"
         }`}
       >
-        {isSubmitting ? <LoadingSpinner size="small" color="white" /> : 'Submit Solution'}
+        {isSubmitting ? <LoadingSpinner size="small" color="white" /> : "Submit Solution"}
       </button>
     </form>
   );

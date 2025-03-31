@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Pie } from "react-chartjs-2";
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from "chart.js";
+import axios from "axios";
 import ProfileMenu from "@/components/ProfileMenu";
 
 // Register Chart.js components
@@ -8,32 +9,23 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 
 const Profile = () => {
   const [userData, setUserData] = useState(null);
-  const token = localStorage.getItem("token");
   const TOTAL_PROBLEMS = 10; // Hardcoded total problems
 
   useEffect(() => {
     const fetchUserData = async () => {
       try {
-        const response = await fetch("http://localhost:5000/api/auth/me", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const response = await axios.get("http://localhost:5000/api/auth/me", {
+          withCredentials: true, // Ensures the cookie is sent with the request
         });
 
-        if (!response.ok) {
-          throw new Error("Failed to fetch user details");
-        }
-
-        const data = await response.json();
-        console.log(data);
-        setUserData(data);
+        setUserData(response.data);
       } catch (error) {
         console.error("Error fetching user:", error);
       }
     };
 
     fetchUserData();
-  }, [token]);
+  }, []);
 
   // Calculate solved & unsolved problems
   const solvedProblems = userData?.submissions?.length || 0;
@@ -54,7 +46,7 @@ const Profile = () => {
   return (
     <div className="relative min-h-screen bg-gray-100 flex items-center justify-center">
       
-      {/* Profile Menu in the Top-Left Corner */}
+      {/* Profile Menu in the Top-Right Corner */}
       <div className="absolute top-4 right-8">
         <ProfileMenu />
       </div>

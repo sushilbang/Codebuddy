@@ -5,6 +5,7 @@ const path = require("path");
 const axios = require("axios");
 const Groq = require("groq-sdk");
 const User = require("../models/User");
+const Submission = require("../models/Submissions");
 const authMiddleware = require("../middleware/authMiddleware");
 const router = express.Router();
 const JUDGE0_URL = "http://127.0.0.1:2358"; // Self-hosted Judge0
@@ -113,7 +114,7 @@ const analyzeCode = async (code, language, passedCount, totalCount) => {
 };
 
 // **Submission API with Code Analysis**
-router.post("/submit",upload.single("codeFile"),  authMiddleware,async (req, res) => {
+router.post("/submit", upload.single("codeFile"), authMiddleware, async (req, res) => {
     try {
         const userId = req.user.id;
         const { problemId, languageId, code } = req.body;
@@ -123,19 +124,39 @@ router.post("/submit",upload.single("codeFile"),  authMiddleware,async (req, res
         const testcases = extractTestcases(problemId);
         if (!testcases.length) return res.status(400).json({ error: "No valid test cases found" });
 
+        // Run code against all test cases
         const results = await Promise.all(testcases.map(tc => processTestCase(tc, source_code, languageId)));
+
+        // Count passed test cases
         const passedCount = results.filter(r => r.passed).length;
         const totalCount = results.length;
-        // Call Groq AI for code analysis
+
+        // AI Analysis
         const analysis = await analyzeCode(source_code, languageId, passedCount, totalCount);
+        // Summary
+        const summary = `Passed ${passedCount} out of ${totalCount} test cases.`;
+        // **Save submission to database**
+        const submission = new Submission({
+            userId,
+            problemId,
+            languageId,
+            sourceCode: source_code,
+            results,
+            passedCount,
+            totalCount,
+            analysis,
+            summary,
+        });
+        await submission.save();
+
+        // **Mark problem as solved if all test cases pass**
         if (passedCount === totalCount) {
-            const user = await User.findById(userId); // Fetch user from DB
-            if (user) {
-                await user.addSolvedProblem(problemId); // Add solved problem if all test cases passed
-            }
+            const user = await User.findById(userId);
+            if (user) await user.addSolvedProblem(problemId);
         }
+
         res.json({
-            summary: `${passedCount}/${results.length} test cases passed`,
+            summary: `${passedCount}/${totalCount} test cases passed`,
             details: results,
             analysis
         });
@@ -145,6 +166,27 @@ router.post("/submit",upload.single("codeFile"),  authMiddleware,async (req, res
         res.status(500).json({ error: "Submission processing failed" });
     }
 });
+
+router.get("/latest/:problemid", authMiddleware, async (req, res) => {
+    try {
+        const userId = req.user.id;
+        const { problemid } = req.params;
+
+        const latestSubmission = await Submission.findOne({ userId, problemId: problemid })
+            .sort({ createdAt: -1 });
+
+        if (!latestSubmission) {
+            return res.status(404).json({ message: "No submissions found." });
+        }
+
+        res.json(latestSubmission);
+    } catch (error) {
+        console.error("Error fetching latest submission:", error);
+        res.status(500).json({ message: "Internal server error." });
+    }
+});
+
+  
 
 // router.get("/getSubmissions", authMiddleware,async (req, res) => {
 //     try {

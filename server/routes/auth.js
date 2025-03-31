@@ -48,11 +48,35 @@ router.post("/login", async (req, res) => {
             expiresIn: "1h",
         });
 
+        // cookie
+        res.cookie("token", token, {
+            httpOnly: true,
+            secure: false,  // Set `true` in production (HTTPS)
+            sameSite: "Lax", // Adjust for cross-site requests if needed
+            path: "/", // Ensure cookie applies to all routes
+        });
+        
+
         res.json({ token });
     } catch (error) {
         res.status(400).json({message: error.message});
     }
 });
+
+// Logout
+router.post("/logout", authMiddleware, async (req, res) => {
+    try {
+        res.clearCookie("token", {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "None",
+        });
+        res.json({ message: "Logged out successfully" });
+    } catch (error) {
+        res.status(500).json({ message: "Logout failed", error: error.message });
+    }
+});
+
 
 
 // Get user details
