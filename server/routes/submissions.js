@@ -203,7 +203,7 @@ router.get("/allSubmissions", authMiddleware, async(req, res) => {
     try {
         const userId = req.user.id;
         const submissions = await Submission.find({userId});
-
+        console.log(submissions);
         res.status(200).json({submissions});
     } catch (error) {
         console.error("Error fetching all submission:", error);

@@ -50,8 +50,8 @@ const LandingPage = () => {
                 icon: "📚",
               },
               {
-                title: "Performance Analysis",
-                description: "Analyze your code’s efficiency and optimize it for better performance.",
+                title: "Performance Analysis Using AI",
+                description: "Analyze your code’s efficiency and optimize it for better performance with AI suggestions.",
                 icon: "📊",
               },
             ].map((feature, index) => (

@@ -10,7 +10,6 @@ const Submissions = () => {
   const [submissions, setSubmissions] = useState([]);
   const [selectedCode, setSelectedCode] = useState("");
   const [copied, setCopied] = useState(false);
-  const [status, setStatus] = useState("Tried");
 
   useEffect(() => {
     const fetchSubmissions = async () => {
@@ -18,13 +17,14 @@ const Submissions = () => {
         const response = await axios.get("http://localhost:5000/api/submissions/allSubmissions", {
           withCredentials: true,
         });
-        if(response.data.submissions[0].passedCount === response.data.submissions[0].results.length) {
-            setStatus("Accepted");
-        } else {
-            setStatus("Wrong Answer");
-        }
-        console.log(response.data.submissions[0])
-        setSubmissions(response.data.submissions);
+
+        // Add status to each submission
+        const submissionsWithStatus = response.data.submissions.map((submission) => ({
+          ...submission,
+          status: submission.passedCount === submission.results.length ? "Accepted" : "Wrong Answer",
+        }));
+
+        setSubmissions(submissionsWithStatus);
       } catch (error) {
         console.error("Error fetching submissions:", error);
       }
@@ -39,10 +39,13 @@ const Submissions = () => {
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(selectedCode).then(() => {
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }).catch((err) => console.error("Error copying code:", err));
+    navigator.clipboard
+      .writeText(selectedCode)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 2000);
+      })
+      .catch((err) => console.error("Error copying code:", err));
   };
 
   return (
@@ -62,28 +65,37 @@ const Submissions = () => {
               key={submission._id}
               className="flex justify-between items-center p-3 bg-gray-100 rounded-lg"
             >
-              <span className="font-medium">{getProblemTitle(submissions[0].problemId)}</span>
+              <span className="font-medium">{getProblemTitle(submission.problemId)}</span>
+
               {/* Submission Status */}
-                {status === "Accepted" ? (
-                    <CheckCircle className="w-5 h-5 text-green-500" title="Accepted" />
-                    ) : (
-                    <XCircle className="w-5 h-5 text-red-500" title="Wrong Answer" />
-                    )
-                }
+              {submission.status === "Accepted" ? (
+                <CheckCircle className="w-5 h-5 text-green-500" title="Accepted" />
+              ) : (
+                <XCircle className="w-5 h-5 text-red-500" title="Wrong Answer" />
+              )}
+
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button size="icon" variant="outline" onClick={() => setSelectedCode(submissions[0].sourceCode)}>
+                  <Button
+                    size="icon"
+                    variant="outline"
+                    onClick={() => setSelectedCode(submission.sourceCode)}
+                  >
                     <Eye className="w-5 h-5" />
                   </Button>
                 </DialogTrigger>
                 <DialogContent className="bg-white max-w-2xl p-6 rounded-lg shadow-lg">
                   <div className="flex justify-between items-center mb-2">
                     <h3 className="text-lg font-semibold">Submission Code</h3>
-                    {/* <Button size="icon" variant="outline" onClick={copyToClipboard}>
-                      {copied ? <Check className="w-5 h-5 text-green-500" /> : <Clipboard className="w-5 h-5" />}
-                    </Button> */}
+                    <Button size="icon" variant="outline" onClick={copyToClipboard}>
+                      {copied ? (
+                        <Check className="w-5 h-5 text-green-500" />
+                      ) : (
+                        <Clipboard className="w-5 h-5" />
+                      )}
+                    </Button>
                   </div>
-                  <pre className="bg-gray-100 text-black p-4 rounded-md overflow-auto max-h-96">
+                  <pre className="bg-gray-100 text-black p-4 rounded-md overflow-auto max-h-96 whitespace-pre-wrap">
                     {selectedCode}
                   </pre>
                 </DialogContent>
