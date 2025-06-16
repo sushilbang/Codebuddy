@@ -28,7 +28,6 @@ CodeBuddy is an online coding platform designed to help users write efficient co
 git clone https://github.com/yourusername/codebuddy.git
 cd codebuddy/backend
 npm install
-cp .env.example .env # Add required environment variables
 npm start
 ```
 
